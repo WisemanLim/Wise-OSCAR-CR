@@ -1,0 +1,45 @@
+services:
+  oscar-core:
+    build:
+      context: ..
+      dockerfile: ops/docker/Dockerfile.core
+    image: oscar/core:dev
+    container_name: oscar-core
+    restart: unless-stopped
+    environment:
+      OSCAR_CONFIG: /opt/oscar/config/oscar.json
+      # overrides — set via ops/.env (auto-loaded). Empty = use config/oscar.json values.
+      OSCAR_CAMERA_SOURCE: ${OSCAR_CAMERA_SOURCE:-}
+      OSCAR_INFERENCE_STUB: ${OSCAR_INFERENCE_STUB:-}
+      OSCAR_INFERENCE_MODEL: ${OSCAR_INFERENCE_MODEL:-}
+      OSCAR_HTTP_PORT: ${OSCAR_HTTP_PORT:-}
+      OSCAR_HTTP_BIND: ${OSCAR_HTTP_BIND:-}
+    volumes:
+      - ../config:/opt/oscar/config
+      - ../models:/opt/oscar/models    # drop yolo.onnx here ('make download-model')
+      - oscar-data:/opt/oscar/data
+    # devices:
+    #   # Uncomment when running on a host with /dev/video0 (Linux USB cam):
+    #   - "/dev/video0:/dev/video0"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  oscar-web:
+    build:
+      context: ..
+      dockerfile: ops/docker/Dockerfile.web
+    image: oscar/web:dev
+    container_name: oscar-web
+    restart: unless-stopped
+    depends_on:
+      - oscar-core
+    ports:
+      - "5173:80"
+
+volumes:
+  oscar-data:

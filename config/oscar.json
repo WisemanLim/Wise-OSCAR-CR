@@ -1,0 +1,45 @@
+{
+  "camera": {
+    "source": "0",
+    "target_fps": 30,
+    "width": 1280,
+    "height": 720,
+    "reconnect_ms": 2000
+  },
+  "inference": {
+    "model_path": "models/yolo.onnx",
+    "labels_path": "models/coco.names",
+    "conf_threshold": 0.25,
+    "iou_threshold": 0.45,
+    "input_size": 640,
+    "provider": "cpu",
+    "stub_mode": true
+  },
+  "tracker": {
+    "match_thresh": 0.8,
+    "track_buffer": 30,
+    "det_thresh": 0.5,
+    "frame_rate": 30
+  },
+  "localization": {
+    "fx": 800.0,
+    "fy": 800.0,
+    "cx": 640.0,
+    "cy": 360.0,
+    "ground_height_m": 0.0,
+    "camera_height_m": 1.5,
+    "static_velocity_thr": 0.1
+  },
+  "storage": {
+    "db_path": "data/oscar.sqlite",
+    "video_dir": "data/videos",
+    "segment_seconds": 60,
+    "enable_video": true
+  },
+  "server": {
+    "bind": "0.0.0.0",
+    "port": 8080,
+    "ws_port": 8081,
+    "web_root": "web/dist"
+  }
+}

@@ -1,0 +1,95 @@
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- C/C++ build artifacts ----------
+build/
+out/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.exp
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+_deps/
+install_manifest.txt
+compile_commands.json
+.cache/
+
+# ---------- Web / Node ----------
+node_modules/
+web/node_modules/
+web/dist/
+web/.vite/
+web/*.tsbuildinfo
+web/.eslintcache
+.npm/
+.yarn/
+.pnp.*
+
+# ---------- Editors / IDEs ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.history/
+
+# ---------- Claude Code / OMC tooling artifacts ----------
+.claude/
+.omc/
+.review/
+
+# ---------- Runtime data ----------
+data/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# ---------- Models (large + user-downloaded) ----------
+models/*.onnx
+models/*.pt
+models/*.engine
+models/*.bin
+models/*.weights
+
+# ---------- Env / secrets ----------
+ops/.env
+.env
+.env.local
+.env.*.local
+
+# ---------- Logs / temp ----------
+*.log
+*.tmp
+*.bak
+*.original.md
+
+# ---------- Python (ultralytics local venv, if used) ----------
+*.pyc
+__pycache__/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# ---------- Misc ----------
+*.tar
+*.tar.gz
+*.zip

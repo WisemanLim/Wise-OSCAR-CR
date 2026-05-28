@@ -1,0 +1,47 @@
+FROM ubuntu:22.04 AS build
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential cmake git pkg-config ca-certificates \
+        libopencv-dev libsqlite3-dev libssl-dev \
+        ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY core/ /src/core/
+COPY config/ /src/config/
+COPY models/ /src/models/
+
+WORKDIR /src/build
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DOSCAR_USE_OPENCV=ON -DOSCAR_USE_ONNX=OFF /src/core \
+ && cmake --build . -j"$(nproc)" \
+ && cmake --install . --prefix /opt/oscar
+
+FROM ubuntu:22.04 AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+# GStreamer plugins are required for OpenCV to open http:// (MJPEG) and rtsp:// URLs.
+# Ubuntu's libopencv links GStreamer, but without these runtime plugins it falls
+# through to CAP_IMAGES and fails with "uridecodebin" / "can't find starting number".
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libopencv-dev libsqlite3-0 ffmpeg ca-certificates curl \
+        gstreamer1.0-tools \
+        gstreamer1.0-plugins-base \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-bad \
+        gstreamer1.0-plugins-ugly \
+        gstreamer1.0-libav \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/oscar
+COPY --from=build /opt/oscar/bin/oscar_core /opt/oscar/bin/oscar_core
+COPY --from=build /src/config /opt/oscar/config
+COPY --from=build /src/models /opt/oscar/models
+RUN mkdir -p /opt/oscar/data/videos
+
+EXPOSE 8080
+HEALTHCHECK --interval=10s --timeout=3s --start-period=8s --retries=3 \
+  CMD curl -fsS http://localhost:8080/api/health || exit 1
+
+ENV OSCAR_CONFIG=/opt/oscar/config/oscar.json
+CMD ["/opt/oscar/bin/oscar_core", "--config", "/opt/oscar/config/oscar.json"]
